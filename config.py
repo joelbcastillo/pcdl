@@ -1,6 +1,7 @@
 import os
-from flask.ext.dotenv import DotEnv
+from dotenv import load_dotenv, find_dotenv
 
+load_dotenv(find_dotenv())
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -24,14 +25,14 @@ class Config:
 
     @staticmethod
     def init_app(app):
-        env = DotEnv()
-        env.init_app(app, env_file=os.path.dirname(basedir, '.env'))
+        pass
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
                               'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
+
 
 
 class TestingConfig(Config):
