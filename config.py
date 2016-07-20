@@ -24,10 +24,6 @@ class Config:
 
     @staticmethod
     def init_app(app):
-        pass
-
-    @classmethod
-    def init_app(self, app):
         env = DotEnv()
         env.init_app(app, env_file=os.path.dirname(basedir, '.env'))
 
