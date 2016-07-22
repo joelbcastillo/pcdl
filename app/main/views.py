@@ -42,9 +42,10 @@ def index():
         db.session.add(post)
         return redirect(url_for('.index'))
     page = request.args.get('page', 1, type=int)
-    show_followed = False
     if current_user.is_authenticated:
-        show_followed = bool(request.cookies.get('show_followed', ''))
+        show_followed = bool(request.cookies.get("show_followed", ''))
+    else:
+        show_followed = False
     if show_followed:
         query = current_user.followed_posts
     else:
@@ -73,8 +74,8 @@ def user(username):
 def users():
     users = User.query.all()
     page = request.args.get('page', 1, type=int)
-    pagination = users.order_by(User.username).paginate(page, per_page=current_app.config['PCDL_POSTS_PER_PAGE'],
-                                                        error_out=False)
+    pagination = User.query.order_by(User.name).paginate(page, per_page=current_app.config['PCDL_POSTS_PER_PAGE'],
+                                                         error_out=False)
     users = pagination.items
     return render_template('users.html', users=users, pagination=pagination)
 
@@ -112,6 +113,8 @@ def edit_profile_admin(id):
         user.about_me = form.about_me.data
         db.session.add(user)
         flash('The profile has been updated.')
+        if current_user.is_administrator:
+            return redirect(url_for('.users'))
         return redirect(url_for('.user', username=user.username))
     form.email.data = user.email
     form.username.data = user.username
