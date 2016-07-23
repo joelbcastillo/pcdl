@@ -71,6 +71,7 @@ def user(username):
 
 
 @main.route('/users')
+@login_required
 def users():
     users = User.query.all()
     page = request.args.get('page', 1, type=int)
