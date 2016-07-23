@@ -5,8 +5,10 @@ from . import auth
 from .. import db
 from ..models import User
 from ..email import send_email
-from .forms import LoginForm, RegistrationForm, ChangePasswordForm,\
+from .forms import LoginForm, RegistrationForm, AdminRegistrationForm, \
     PasswordResetRequestForm, PasswordResetForm, ChangeEmailForm
+
+from datetime import datetime
 
 
 @auth.before_app_request
@@ -61,6 +63,29 @@ def register():
         flash('A confirmation email has been sent to you by email.')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', form=form)
+
+
+@auth.route('/admin_register', methods=['GET', 'POST'])
+def admin_register():
+    form = AdminRegistrationForm()
+    if form.validate_on_submit():
+        user = User(email=form.email.data,
+                    username=form.username.data or form.email.data.split('@')[0],
+                    password=datetime.today().strftime('%A%-d'),
+                    confirmed=False,
+                    name=form.name.data,
+                    location=form.location.data,
+                    about_me=form.location.data,
+                    member_since=datetime.now())
+
+        db.session.dadd(user)
+        db.session.commit()
+        token = user.generate_confirmation_token()
+        send_email(user.email, 'Confirm Your Account',
+                   'auth/email/confirm', user=user, token=token)
+        flash('A confirmation email has been sent to the user.')
+        return redirect(url_for('main.users'))
+    return render_template('auth/admin_register.html', form=form)
 
 
 @auth.route('/confirm/<token>')
