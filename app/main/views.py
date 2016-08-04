@@ -71,6 +71,7 @@ def user(username):
 
 
 @main.route('/users')
+@login_required
 def users():
     users = User.query.all()
     page = request.args.get('page', 1, type=int)
@@ -281,3 +282,7 @@ def moderate_disable(id):
     db.session.add(comment)
     return redirect(url_for('.moderate',
                             page=request.args.get('page', 1, type=int)))
+
+@main.route('/about')
+def about():
+    pass
